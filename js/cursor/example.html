@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <title>Custom Cursor Example</title>
 
+    <!-- Example Page Script -->
+    <script defer type="module" src="example.js"></script>
+
     <!-- Example Page Style -->
     <style>
         body {
@@ -40,10 +43,10 @@
         }
     </style>
 
-    <!-- Custom Cursor Base Style -->
-    <link rel="stylesheet" href="cursor.css">
+    <!-- Cursor Base Style -->
+    <link rel="stylesheet" href="src/cursor.css">
 
-    <!-- Example Custom Cursor Style -->
+    <!-- Example Cursor Style -->
     <style>
         .cursor {
             --cursor-width: 1rem;
@@ -60,34 +63,13 @@
 </head>
 
 <body>
+
     <!-- Include the custom cursor element -->
     <div id="custom-cursor" class="cursor"></div>
 
     <button id="enable-cursor">Enable Custom Cursor</button>
     <button id="disable-cursor" hidden>Disable Custom Cursor</button>
 
-    <!-- Custom Cursor Script -->
-    <script src="cursor.js"></script>
-
-    <script>
-        /* Initialize the custom cursor */
-        const customCursor = new CustomCursor('#custom-cursor')
-
-        const enableCursorButton = document.getElementById('enable-cursor')
-        const disableCursorButton = document.getElementById('disable-cursor')
-
-        enableCursorButton.addEventListener("click", (event) => {
-            enableCursorButton.hidden = true
-            customCursor.enable(event.clientX, event.clientY)
-            disableCursorButton.hidden = false
-        })
-
-        disableCursorButton.addEventListener("click", () => {
-            disableCursorButton.hidden = true
-            customCursor.disable()
-            enableCursorButton.hidden = false
-        })
-    </script>
 </body>
 
 </html>

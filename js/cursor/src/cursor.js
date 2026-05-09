@@ -1,19 +1,32 @@
-class CustomCursor {
+/**
+ * Represents a custom DOM cursor that follows mouse movement
+ */
+class Cursor {
 
+    /**
+     * Creates an instance of the Cursor.
+     * @param {string} cursorElementSelector - The CSS selector for the cursor element.
+    */
     constructor(cursorElementSelector) {
-
-        this.cursorElementSelector = cursorElementSelector
+        this._cursorElementSelector = cursorElementSelector
+        this._frameRequestId = null
         this._cursorElement = null
 
-        /* MouseMove Event position variables */
+        /** @type {number} Latest registered MouseMove Event clientX */
         this.clientX = 0
-        this.clientY = 0
 
-        this._frameRequestId = null
+        /** @type {number} Latest registered MouseMove Event clientY */
+        this.clientY = 0
     }
 
+    /**
+     * Gets the cursor element from the DOM.
+     * Caches the result after the first lookup.
+     * @throws {Error} If the element is not found.
+     * @returns {HTMLElement}
+    */
     get cursorElement() {
-        return (this._cursorElement ??= document.querySelector(this.cursorElementSelector)) ?? (() => {
+        return (this._cursorElement ??= document.querySelector(this._cursorElementSelector)) ?? (() => {
             throw Error("No element with class 'cursor' found.")
         })()
     }
@@ -36,6 +49,11 @@ class CustomCursor {
         this._frameRequestId = requestAnimationFrame(this._requestCursorFrame);
     }
 
+    /**
+     * Initializes the cursor, attaches event listeners, and begins the animation loop.
+     * @param {number} [startX=0] - Initial X position. (default: 0)
+     * @param {number} [startY=0] - Initial Y position. (default: 0)
+    */
     enable(startX, startY) {
 
         /* Initialize position variables */
@@ -53,10 +71,13 @@ class CustomCursor {
         /* Request first animation frame */
         this._requestCursorFrame()
 
-        /* Show the custom cursor */
+        /* Show the cursor */
         document.body.classList.toggle("cursor-visible", true)
     }
 
+    /**
+     * Stops the animation loop, removes event listeners, and hides the cursor.
+    */
     disable() {
         /* Cancel any pending animation frame */
         cancelAnimationFrame(this._frameRequestId)
@@ -64,8 +85,10 @@ class CustomCursor {
         /* Remove cursor event listener */
         window.removeEventListener('mousemove', this._onMouseMove)
 
-        /* Hide the custom cursor */
+        /* Hide the cursor */
         document.body.classList.toggle("cursor-visible", false)
     }
 
 }
+
+export { Cursor }
