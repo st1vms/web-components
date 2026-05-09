@@ -1,0 +1,31 @@
+/* Disable cursor for every element in cursor container */
+.cursor-visible,
+.cursor-visible * {
+    cursor: none !important;
+}
+
+.cursor-visible .cursor {
+    visibility: visible !important;
+}
+
+.cursor {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: 9999;
+
+    /* Hint for browser optimization */
+    will-change: transform;
+
+    /* Cursor Dimensions */
+    --cursor-width: 1rem;
+    --cursor-height: 1rem;
+
+    /* Center the cursor using margin */
+    margin-left: calc(-1 * (var(--cursor-width) / 2));
+    margin-top: calc(-1 * (var(--cursor-height) / 2));
+    width: var(--cursor-width);
+    height: var(--cursor-width);
+}
