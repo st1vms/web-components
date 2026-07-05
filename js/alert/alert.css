@@ -1,0 +1,147 @@
+
+.alert-container {
+    --alert-bg-opacity: 0.2;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, var(--alert-bg-opacity));
+    margin: 0;
+    padding: 0;
+    z-index: 9999;
+}
+
+.alert-container.visible {
+    opacity: 1;
+    transition: opacity 0.1s ease;
+}
+
+.alert-card {
+    scale: 0.8;
+    transform: translateY(-75px);
+    transition: scale 0.4s ease, transform 0.4s ease;
+    position: relative;
+    width: 500px;
+    max-height: 90%;
+    padding: 1rem;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    background: white;
+    color: black;
+    border-radius: 6px;
+}
+
+.alert-container.visible .alert-card {
+    scale: 1;
+    transform: translateY(0px);
+}
+
+.alert-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.alert-icon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.alert-icon.info {
+    stroke: #3fc3ee;
+}
+
+.alert-icon.success {
+    stroke: #a5dc86;
+}
+
+.alert-icon.error {
+    fill: red;
+}
+
+.alert-icon.warning {
+    stroke: #f8bb86;
+}
+
+.alert-icon.question {
+    stroke: #87adbd;
+}
+
+.alert-title {
+    width: 100%;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: text;
+}
+
+.alert-message {
+    width: 100%;
+    max-height: 155px;
+    text-align: center;
+    overflow: auto;
+    padding: 1rem;
+    font-size: 1.15rem;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.alert-footer {
+    /* Footer Configuration Variables */
+    --timer-bar-bg-color: linear-gradient(90deg,
+            #1874CD 0%,
+            #1E90FF 50%,
+            #63B8FF 100%);
+    --timer-duration: 1s;
+
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 0.5rem;
+}
+
+.alert-footer>button {
+    min-width: 125px;
+    max-width: 40%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-inline: 1rem;
+}
+
+.alert-container.visible.timer-alert .alert-footer::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0 0 0px 6px;
+    height: 0.4rem;
+    background: var(--timer-bar-bg-color);
+    animation: var(--timer-duration) linear 0s 1 both timerBarAnimation;
+}
+
+@keyframes timerBarAnimation {
+
+    from {
+        right: 0;
+    }
+
+    to {
+        right: 100%;
+    }
+}
