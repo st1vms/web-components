@@ -1,4 +1,3 @@
-
 .alert-container {
     --alert-bg-opacity: 0.2;
     opacity: 0;
@@ -38,8 +37,8 @@
     justify-content: space-between;
     border: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    background: var(--surface-color);
-    color: var(--on-surface-color);
+    background: white;
+    color: black;
     border-radius: 6px;
     z-index: 9999;
 }
@@ -52,10 +51,13 @@
     height: 1rem;
     color: black;
     cursor: pointer;
+    font-style: normal;
+    font-weight: bold;
+    transition: transform 0.1s ease-in-out;
 }
 
 .alert-card-close-button:hover:not(:active) {
-    scale: 1.2;
+    transform: scale(1.1);
 }
 
 .alert-container.visible .alert-card {
@@ -85,7 +87,7 @@
 }
 
 .alert-icon.error {
-    fill: var(--bs-danger);
+    fill: red;
 }
 
 .alert-icon.warning {
@@ -163,7 +165,12 @@
 }
 
 @media (prefers-color-scheme: dark) {
-    .alert-card-close-button {
+    .alert-card {
+        background-color: rgb(1, 10, 21);
         color: white;
+    }
+
+    .alert-card-close-button {
+        color: white !important;
     }
 }
