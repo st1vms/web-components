@@ -5,11 +5,13 @@ class Alert {
     /**
      * @callback AlertDismissCallback
      *
-     * @param {'confirm' | 'cancel' | 'timer'} reason A string representing the reason why this alert dismissed.
+     * @param {'confirm' | 'cancel' | 'timer' | 'close'} reason A string representing the reason why this alert dismissed.
      * Can be either:
      * - `confirm`: User dismissed the alert by clicking the confirm button.
      * - `cancel`: User clicked the cancel button.
      * - `timer`: The alert auto closed itself due to timer expiration.
+     * - `close`: User clicked on the close button.
+     * - `backdrop`: User closed the modal by clicking the backdrop.
      * @returns {boolean | undefined} This callback can return true or false to consume the dismiss event and prevent the alert from closing.
     */
 
@@ -25,6 +27,8 @@ class Alert {
      * set to `null` to disable the confirm button.
      * @property {string} [cancelButton=null] Set the cancel button text (defaults to `null`, no button),
      * set to `null` to disable the cancel button.
+     * @property {boolean} [closeButtonEnabled=false] Enables the close button by setting this flag to true (default: false).
+     * @property {boolean} [backdropCanClose=false] Set to true to enable closing the modal by clicking the backdrop (default is false).
      * @property {AlertDismissCallback} [onDismissCallback=null] Callback to be called once the alert is dismissed.
      * @property {number} [bgOpacity=0.2] Backdrop opacity (defaults to 0.2).
      * @property {number} [timer=null] Set a millisecond timer to auto close the alert after some time (defaults to null, no timer).
@@ -36,6 +40,8 @@ class Alert {
         icon: null,
         confirmButton: "OK",
         cancelButton: null,
+        closeButtonEnabled: false,
+        backdropCanClose: false,
         onDismissCallback: null,
         bgOpacity: 0.2,
         timer: null,
@@ -85,12 +91,12 @@ class Alert {
     createCardElement() {
 
         /* Alert Container/Backdrop */
-        const container = this.createElement("div", {
+        this.alertContainer = this.createElement("div", {
             classList: ["alert-container"]
         })
 
         /* Setup container background opacity */
-        container.style.setProperty(
+        this.alertContainer.style.setProperty(
             "--alert-bg-opacity", this.config.bgOpacity
         )
 
@@ -187,13 +193,34 @@ class Alert {
             })
         }
 
+        if (this.config.backdropCanClose) {
+            /* Setup the alert container backdrop click listener */
+            this.alertContainer.addEventListener('click', (event) => {
+                if (event.target === event.currentTarget) {
+                    this.dismiss('backdrop')
+                }
+            })
+        }
+
+
+        if (this.config.closeButtonEnabled) {
+            /* Create and setup close button */
+            const closeButton = this.createElement('i', {
+                classList: ["fas", "fa-xmark", "alert-card-close-button"]
+            })
+            closeButton.addEventListener('click', (event) => {
+                this.dismiss('close')
+            })
+            alertCard.append(closeButton)
+        }
+
 
         /* Build Alert Card */
         alertCard.append(alertHeader, alertMessage, alertFooter)
 
         /* Wrap the card into the container */
-        container.append(alertCard)
-        return container
+        this.alertContainer.append(alertCard)
+        return this.alertContainer
     }
 
     /**

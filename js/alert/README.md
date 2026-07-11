@@ -33,7 +33,7 @@ new Alert().show({
     text: 'Operation completed successfully',
     timer: 10000, // 10 seconds
     onDismissCallback: (reason) => {
-        /* This callback is called immediately before the alert closes, after calling dismiss() */
+        /* This callback is called right before the alert closes, after dismiss() has been called */
         switch(reason) {
             case 'confirm':
                 console.log("The user clicked the confirm button")
@@ -42,7 +42,13 @@ new Alert().show({
                 console.log("The user clicked the cancel button")
                 return
             case 'timer':
-                console.log("The alert closed due to the timer expiring")
+                console.log("The alert closed because the timer expired")
+                return
+            case 'close':
+                console.log("The user clicked the close button")
+                return
+            case 'backdrop':
+                console.log("The user closed the modal by clicking the backdrop")
                 return
         }
 
@@ -89,12 +95,15 @@ The `show` method receives an object with this default configuration:
 
 ```js
 {
-    text: null, // Message text
+    text: null, // Message text (or HTML)
+    html: false, // If set to true, the `text` property will be treated as HTML.
     title: null, // Title text
     icon: null, // Icon identifier (success, error, warning, info, question)
     confirmButton: "OK", // Enables the confirm button by setting its text
     cancelButton: null, // Enables the cancel button by setting its text
-    onDismissCallback: null, // Callback to execute before the alert closes; can return a boolean to prevent the alert from closing.
+    closeButtonEnabled: false, // Set to true to enable the close button in the top right corner.
+    backdropCanClose: false, // Set to true to close the alert by clicking on the backdrop.
+    onDismissCallback: null, // Callback to execute before the alert closes; can return a boolean to prevent closure.
     timer: null, // Sets a timer in milliseconds, after which the alert will close automatically.
     bgOpacity: 0.2, // Sets the opacity of the backdrop color.
 }

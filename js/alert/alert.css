@@ -14,7 +14,7 @@
     background: rgba(0, 0, 0, var(--alert-bg-opacity));
     margin: 0;
     padding: 0;
-    z-index: 9999;
+    z-index: 9998;
 }
 
 .alert-container.visible {
@@ -23,6 +23,7 @@
 }
 
 .alert-card {
+    position: relative;
     scale: 0.8;
     transform: translateY(-75px);
     transition: scale 0.4s ease, transform 0.4s ease;
@@ -37,9 +38,24 @@
     justify-content: space-between;
     border: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    background: white;
-    color: black;
+    background: var(--surface-color);
+    color: var(--on-surface-color);
     border-radius: 6px;
+    z-index: 9999;
+}
+
+.alert-card-close-button {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    width: 1rem;
+    height: 1rem;
+    color: black;
+    cursor: pointer;
+}
+
+.alert-card-close-button:hover:not(:active) {
+    scale: 1.2;
 }
 
 .alert-container.visible .alert-card {
@@ -69,7 +85,7 @@
 }
 
 .alert-icon.error {
-    fill: red;
+    fill: var(--bs-danger);
 }
 
 .alert-icon.warning {
@@ -143,5 +159,11 @@
 
     to {
         right: 100%;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .alert-card-close-button {
+        color: white;
     }
 }
