@@ -1,3 +1,6 @@
+# Repo Specific
+*.test*
+
 # VS Code
 .vscode/*
 !.vscode/settings.json

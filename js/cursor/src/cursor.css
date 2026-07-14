@@ -4,12 +4,12 @@
     cursor: none !important;
 }
 
-.cursor-visible .cursor {
+.cursor-visible > .cursor {
     visibility: visible !important;
 }
 
 .cursor {
-    position: fixed !important;
+    position: absolute !important;
     top: 0;
     left: 0;
     visibility: hidden !important;
@@ -27,5 +27,5 @@
     margin-left: calc(-1 * (var(--cursor-width) / 2));
     margin-top: calc(-1 * (var(--cursor-height) / 2));
     width: var(--cursor-width);
-    height: var(--cursor-width);
+    height: var(--cursor-height);
 }

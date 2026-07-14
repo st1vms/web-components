@@ -7,7 +7,7 @@ Custom cursor component for web pages.
 Add the cursor element and load the component script:
 
 ```html
-<div id="cursor" aria-hidden="true"></div>
+<div class="cursor" id="my-cursor"></div>
 <script type="module" src="./cursor.js"></script>
 ```
 
@@ -16,24 +16,25 @@ Add the cursor element and load the component script:
 Initialize the cursor and keep the returned instance:
 
 ```js
-import { initCursor } from "./cursor.js";
+import { Cursor } from "./cursor.js";
 
-const cursor = initCursor({
-  element: "#cursor"
-});
+const cursor = new Cursor("#my-cursor");
 ```
 
 ### `cursor.enable()`
 
-Enables the custom cursor behavior (starts tracking/moving the cursor element).
+Enables the custom cursor visibility (starts tracking/moving the cursor element).
 
 ```js
 cursor.enable();
+
+/* Or enable the cursor in a specific location (relative to container) */
+// cursor.enable(200, 200);
 ```
 
 ### `cursor.disable()`
 
-Disables the custom cursor behavior (stops tracking and restores default behavior based on implementation).
+Disables the custom cursor visibility (stops tracking and restores default behavior based on implementation).
 
 ```js
 cursor.disable();
@@ -43,14 +44,15 @@ cursor.disable();
 
 ```css
 #cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
+    --cursor-width: 1rem !important;
+    --cursor-height: 1rem !important;
+    background: dodgerblue;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 1;
 }
 ```
 
-## Notes
+### Note
 
-- Keep `pointer-events: none` so the cursor element does not block clicks.
-- Hide native cursor only if needed for your UX (`body { cursor: none; }`).
+- Hides native cursor (`body { cursor: none; }`) so the cursor element does not block clicks.

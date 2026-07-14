@@ -8,46 +8,52 @@ class Cursor {
      * @param {string} cursorElementSelector - The CSS selector for the cursor element.
     */
     constructor(cursorElementSelector) {
-        this._cursorElementSelector = cursorElementSelector
+
+        /* Retrieve cursor element */
+        if (cursorElementSelector instanceof HTMLElement) {
+            this.cursorElement = cursorElementSelector
+        } else if (typeof cursorElementSelector === 'string') {
+            this.cursorElement = document.querySelector(cursorElementSelector)
+            if (!this.cursorElement) {
+                throw Error("Cursor element not found!")
+            }
+        } else {
+            throw Error("Must provide an HTML Element or a CSS selector.")
+        }
+
         this._frameRequestId = null
-        this._cursorElement = null
 
         /** @type {number} Latest registered MouseMove Event clientX */
         this.clientX = 0
 
         /** @type {number} Latest registered MouseMove Event clientY */
         this.clientY = 0
+
     }
 
-    /**
-     * Gets the cursor element from the DOM.
-     * Caches the result after the first lookup.
-     * @throws {Error} If the element is not found.
-     * @returns {HTMLElement}
-    */
-    get cursorElement() {
-        return (this._cursorElement ??= document.querySelector(this._cursorElementSelector)) ?? (() => {
-            throw Error("No element with class 'cursor' found.")
-        })()
-    }
+    _onMouseMove = ((event) => {
+        // Ottieni i limiti del contenitore padre
+        const rect = this.cursorElement.parentElement.getBoundingClientRect();
 
-    _onMouseMove = (event) => {
-        this.clientX = event.clientX
-        this.clientY = event.clientY
-    }
+        // Calcola la posizione del mouse RELATIVA al padre, usando le coordinate globali
+        this.clientX = event.clientX - rect.left;
+        this.clientY = event.clientY - rect.top;
 
-    _updatePosition = (x, y) => {
+        console.log(this.cursorElement.id, this.clientX, this.clientY);
+    }).bind(this)
+    
+    _updatePosition = ((x, y) => {
         /* Update transform3d to move the cursor */
         this.cursorElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    }
+    }).bind(this)
 
-    _requestCursorFrame = () => {
+    _requestCursorFrame = (() => {
         /* Move cursor to the latest mousemove event position */
         this._updatePosition(this.clientX, this.clientY)
 
         /* Request the next animation frame */
         this._frameRequestId = requestAnimationFrame(this._requestCursorFrame);
-    }
+    }).bind(this)
 
     /**
      * Initializes the cursor, attaches event listeners, and begins the animation loop.
@@ -65,14 +71,17 @@ class Cursor {
             this._updatePosition(startX, startY)
         }
 
+        /* Remove cursor event listener */
+        this.cursorElement.parentElement.removeEventListener('mousemove', this._onMouseMove)
+
         /* Attach mousemove event listener */
-        window.addEventListener('mousemove', this._onMouseMove)
+        this.cursorElement.parentElement.addEventListener('mousemove', this._onMouseMove)
 
         /* Request first animation frame */
         this._requestCursorFrame()
 
         /* Show the cursor */
-        document.body.classList.toggle("cursor-visible", true)
+        this.cursorElement.parentElement.classList.add("cursor-visible")
     }
 
     /**
@@ -83,10 +92,10 @@ class Cursor {
         cancelAnimationFrame(this._frameRequestId)
 
         /* Remove cursor event listener */
-        window.removeEventListener('mousemove', this._onMouseMove)
+        this.cursorElement.parentElement.removeEventListener('mousemove', this._onMouseMove)
 
         /* Hide the cursor */
-        document.body.classList.toggle("cursor-visible", false)
+        this.cursorElement.parentElement.classList.remove("cursor-visible")
     }
 
 }
