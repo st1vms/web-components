@@ -1,6 +1,6 @@
 # Text Focus Search
 
-ES6 Module: [focus.js](js/text-focus/focus.js)
+ES6 Module: [focus.js](text-focus/focus.js)
 
 This component allows you to manage a text focus box, which you can use to highlight any portion of text inside an element and automatically scroll to it. It also allows you to reposition the focus box onto a placeholder element, enabling a smooth transition between activating and deactivating the focus.
 

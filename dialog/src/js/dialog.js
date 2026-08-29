@@ -1,0 +1,291 @@
+/*
+MIT License
+
+Copyright (c) 2023 Stefano Raneri
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/**
+ * @typedef {Object} DialogConfig
+ * @property {boolean} [backdrop=true] Enable/disable backdrop
+ * @property {boolean} [backdropCanClose=true] Whether clicking backdrop closes the dialog
+ * @property {boolean} [closeButton=true] Whether to show a close button
+ * @property {"left"|"right"} [closeButtonPosition="right"] Top corner position of the close button (default: right)
+ * @property {boolean} [dom=true] If false, use the string returned by onshow instead of the DOM element
+ * @property {boolean} [spinner=true] Whether to show the loading spinner 
+ * @property {() => string|void|Promise} [onshow] Called after the dialog box opens.
+ * @property {() => void|Promise} [onload] Called after the content has been loaded and displayed.
+ * @property {() => boolean|void|Promise} [onclose] Called before each closure; returns false to cancel the closure.
+ */
+class Dialog {
+
+    is_open;
+    is_loading;
+    #defaultConfig = {
+        backdrop: true,
+        backdropCanClose: true,
+        closeButton: true,
+        closeButtonPosition: "right",
+        dom: true,
+        spinner: true
+    }
+
+    /**
+   * Create and initialize a Dialog.
+   * @param {HTMLElement} dialogElement The dialog container element.
+   * @param {DialogConfig} [config] Object for configuration options.
+   */
+    constructor(dialogElement, config) {
+        this.dialogContentElement = dialogElement
+
+        this.config = config ?? {}
+        this.#initConfig()
+
+        this.dialogContainer = undefined
+        this.dialogCloseButton = undefined
+        this.dialogSpinner = undefined
+
+        this.is_open = false
+        this.is_loading = false
+        this.#initDialog()
+    }
+
+    #is_async(func) {
+        return func?.constructor?.name === 'AsyncFunction';
+    }
+
+    #initConfig() {
+        for (const k in this.#defaultConfig) {
+            if (this.config[k] === undefined) {
+                this.config[k] = this.#defaultConfig[k]
+            }
+        }
+    }
+
+    #initDialog() {
+
+        if (this.dialogContentElement == null) {
+            throw new Error("Dialog content element is null")
+        }
+
+        if (false === this.dialogContentElement.classList.contains("dialog")) {
+            throw new Error("Dialog content element must have class 'dialog'")
+        }
+
+        // Grab z-index of dialog element
+        const dialogZIndex = (parseInt(window.getComputedStyle(this.dialogContentElement).zIndex) || 0)
+
+        // Container
+        this.dialogContainer = document.createElement("div")
+        this.dialogContainer.classList.add("dialog-container")
+        this.dialogContainer.style.zIndex = dialogZIndex // Same depth as content
+
+        // Backdrop
+        this.dialogBackdrop = document.createElement("div")
+        this.dialogBackdrop.classList.add("dialog-backdrop")
+        this.dialogBackdrop.style.zIndex = dialogZIndex - 1  // Behind dialog
+
+        // Check if this backdrop is configured to close the dialog on click
+        if (this.config.backdropCanClose !== false) {
+            this.dialogBackdrop.addEventListener("click", (event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                this.close()
+            })
+        }
+
+        // Close button
+        if (this.config["closeButton"] === true) {
+            this.dialogCloseButton = document.createElement("button")
+            this.dialogCloseButton.classList.add("dialog-close-button")
+            this.dialogCloseButton.style.zIndex = dialogZIndex + 1 // In front dialog
+
+            if (this.config.closeButtonPosition === "right") {
+                this.dialogCloseButton.classList.add("right")
+            } else if (this.config.closeButtonPosition === "left") {
+                this.dialogCloseButton.classList.add("left")
+            }
+
+            this.dialogCloseButton.addEventListener("click", (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                this.close()
+            })
+        }
+
+
+        // Construct dialog
+        const prevNode = this.dialogContentElement.cloneNode(true)
+
+        if (this.dialogCloseButton != null) {
+            this.dialogContainer.appendChild(this.dialogCloseButton)
+        }
+
+        this.dialogContainer.appendChild(prevNode)
+
+        // Loading spinner
+        if (this.config["spinner"] === true) {
+            this.dialogSpinner = this.#createSpinner()
+            this.dialogContainer.appendChild(this.dialogSpinner)
+        }
+
+        this.dialogContentElement.replaceWith(this.dialogContainer)
+        this.dialogContentElement = prevNode
+    }
+
+    #createSpinner() {
+        const spinner = document.createElement("div")
+        spinner.classList.add("spinner")
+        spinner.style.opacity = "0"
+
+        const spinnerContainer = document.createElement("div")
+        spinnerContainer.classList.add("spinner-container")
+
+        const spinnerRotator = document.createElement("div")
+        spinnerRotator.classList.add("spinner-rotator")
+
+        const spinnerCircle = document.createElement("div")
+        spinnerCircle.classList.add("spinner-circle")
+
+        const spinnerLeft = document.createElement("div")
+        spinnerLeft.classList.add("spinner-left")
+        spinnerLeft.appendChild(spinnerCircle)
+
+        const spinnerRight = document.createElement("div")
+        spinnerRight.classList.add("spinner-right")
+        spinnerRight.appendChild(spinnerCircle)
+
+        spinnerRotator.appendChild(spinnerLeft)
+        spinnerRotator.appendChild(spinnerRight)
+
+        spinnerContainer.appendChild(spinnerRotator)
+        spinner.appendChild(spinnerContainer)
+        return spinner
+    }
+
+    #showSpinner() {
+        this.dialogSpinner.style.opacity = "1"
+    }
+
+    #hideSpinner() {
+        this.dialogSpinner.style.opacity = "0"
+    }
+
+    #closeDialog() {
+        this.dialogContentElement.removeAttribute("open")
+        this.dialogContainer.removeAttribute("open")
+        this.dialogBackdrop.remove()
+
+        if (this.config["dom"] !== true) {
+            // Clear html if this is not a DOM based dialog
+            this.dialogContentElement.innerHTML = ""
+        }
+    }
+
+    async close() {
+
+        if (this.is_open !== true) {
+            console.warn("Closing a Dialog while it's already closed")
+            return
+        }
+
+        if (this.#is_async(this.config["onshow"]) === true &&
+            // Run async onclose callback
+            false === await this.config.onclose()) {
+            return
+        }
+        else if (typeof this.config["onclose"] === "function" &&
+            // Run onclose callback
+            false === this.config.onclose()) {
+            // Block dialog closing
+            return
+        }
+
+        // Close dialog
+        this.#closeDialog()
+        this.is_open = false
+    }
+
+    async show() {
+
+        if (this.is_open !== false || this.is_loading === true) {
+            console.warn("Opening a Dialog while it's already opened/loading")
+            return
+        }
+
+        // Open dialog
+        if (this.config["spinner"] === true) {
+            this.#showSpinner()
+        }
+
+        if (this.config.backdrop !== false) {
+            // Insert and configure backdrop
+            this.dialogContainer.insertAdjacentElement("beforebegin", this.dialogBackdrop)
+        }
+
+        this.dialogContainer.setAttribute("open", "")
+
+        // Set the dialog status as open and loading
+        this.is_open = true
+        this.is_loading = true
+
+        let html = ""
+
+        // Check if the callback is async
+        if (this.#is_async(this.config["onshow"]) === true) {
+            // Run async onshow callback
+            html = await this.config.onshow()
+        } else if (typeof this.config["onshow"] === "function") {
+            // Run onshow callback
+            html = this.config.onshow()
+        }
+
+        // Check if dialog was closed before loading content
+        if (this.is_open !== true) {
+            // Signal loading finished
+            this.is_loading = false
+            return
+        }
+
+        if (this.config["dom"] !== true &&
+            typeof html === "string") {
+            // Load html into the dialog element
+            this.dialogContentElement.innerHTML = html
+        }
+
+        if (this.config["spinner"] === true) {
+            this.#hideSpinner()
+        }
+
+        // Show dialog content
+        this.dialogContentElement.setAttribute("open", "")
+
+        // Check if the callback is async
+        if (this.#is_async(this.config["onload"]) === true) {
+            await this.config.onload()
+        } else if (typeof this.config["onload"] === "function") {
+            // Run onload callback if exists
+            this.config.onload()
+        }
+
+        // Signal loading finished
+        this.is_loading = false
+    }
+}

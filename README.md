@@ -4,8 +4,10 @@ A collection of components for web development.
 
 ## JS Components
 
-- [Alert](js/alert/README.md)
+- [Alert](alert/README.md)
 
-- [Custom Cursor](js/cursor/README.md)
+- [Custom Cursor](cursor/README.md)
 
-- [Text Focus](js/text-focus/README.md)
+- [Dialog](dialog/README.md)
+
+- [Text Focus](text-focus/README.md)
