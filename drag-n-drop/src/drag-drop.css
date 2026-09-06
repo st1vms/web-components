@@ -1,0 +1,110 @@
+/* Container holding all of the drop area elements */
+.drop-area-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.drop-area {
+    position: relative;
+    transition: background 0.1s;
+}
+
+.drop-area:hover {
+    cursor: pointer;
+}
+
+.drop-area-content {
+    transition: opacity 0.3s;
+}
+
+/* Message replacing the drop area on dragover */
+.drop-message {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    opacity: 0;
+    background: whitesmoke;
+    color: black;
+    transition: opacity 0.15s;
+}
+
+.drop-area.dropping .drop-area-content {
+    opacity: 0;
+}
+
+.drop-area.dropping .drop-message {
+    opacity: 1;
+}
+
+/* Container holding file attachment previews */
+.dropped-files-area {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    gap: 0.5rem;
+}
+
+.dropped-files-area>.dropped-file {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    padding-inline: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    white-space: nowrap;
+    gap: 0.25rem;
+}
+
+.dropped-files-area>.dropped-file>span {
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.dropped-file svg {
+    height: auto;
+    width: 1rem;
+}
+
+.dropped-file svg.pdf {
+    fill: red;
+}
+
+.dropped-file svg.jpg {
+    fill: dodgerblue;
+}
+
+.dropped-file svg .unknown {
+    color: black;
+}
+
+.dropped-file .delete-button {
+    color: black;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.dropped-file:hover,
+.dropped-file:hover .delete-button::before {
+    background: whitesmoke;
+    color: black;
+}
+
+.dropped-file .delete-button::before {
+    content: "✖";
+    font-weight: bolder;
+    font-style: normal;
+}

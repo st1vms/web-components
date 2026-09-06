@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Example</title>
+
+    <link rel="stylesheet" href="../src/drag-drop.css">
+
+    <style>
+        /* Center the drop area on the screen */
+        .drop-area-container {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        /* Basic dashed border for visibility */
+        .dashed-border {
+            border: 2px dashed #666;
+            padding: 1rem;
+            cursor: pointer;
+        }
+    </style>
+
+    <!-- Main module script -->
+    <script defer type="module" src="index.js"></script>
+</head>
+<body>
+
+    <!-- Component container -->
+    <div id="my-drop-container" class="drop-area-container">
+
+        <!-- Drop Area -->
+        <div class="drop-area dashed-border">
+
+            <!-- Drop Area content in idle state -->
+            <div class="drop-area-content">
+                Drag here or click
+            </div>
+
+            <!-- Content to show on hover while dragging a file -->
+            <div class="drop-message">
+                Release to attach...
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

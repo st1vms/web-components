@@ -10,4 +10,6 @@ A collection of components for web development.
 
 - [Dialog](dialog/README.md)
 
+- [File Drag-N-Drop](drag-n-drop/README.md)
+
 - [Text Focus](text-focus/README.md)
